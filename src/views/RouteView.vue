@@ -1,0 +1,364 @@
+<template>
+  <div class="page-container">
+    <!-- 顶部导航 -->
+    <div class="nav-section">
+      <div class="nav-buttons">
+        <button class="nav-btn" @click="$router.push('/')">
+          <span>首页</span>
+        </button>
+        <button class="nav-btn active">
+          <span>路线规划</span>
+        </button>
+        <button class="nav-btn" @click="$router.push('/destination')">
+          <span>目的地推荐</span>
+        </button>
+        <button class="nav-btn" @click="$router.push('/scenic')">
+          <span>景点推荐</span>
+        </button>
+        <button class="nav-btn" @click="$router.push('/chat')">
+          <span>智能客服</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="route-container">
+      <!-- 左侧路线规划面板 -->
+      <div class="route-panel">
+        <div class="route-form">
+          <div class="location-input">
+            <div class="input-item">
+              <label>起</label>
+              <input type="text" placeholder="请输入起点" v-model="startPoint" />
+              <button class="location-btn" @click="useMyLocation">
+                <i class="fas fa-map-marker-alt"></i>
+                我的位置
+              </button>
+            </div>
+            <div class="input-item">
+              <label>经</label>
+              <input type="text" placeholder="请输入途经点（可选）" v-model="viaPoint" />
+              <button class="remove-btn" @click="clearViaPoint">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+            <div class="input-item">
+              <label>终</label>
+              <input type="text" placeholder="请输入终点" v-model="endPoint" />
+              <button class="add-btn" @click="addViaPoint">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+          <button class="search-btn" @click="searchRoute">开车去</button>
+        </div>
+
+        <!-- 历史记录 -->
+        <div class="history-records">
+          <h3>历史记录</h3>
+          <div class="record-list">
+            <div v-for="(record, index) in historyRecords" :key="index" class="record-item">
+              <div class="record-content">
+                <div class="record-points">
+                  <span>{{ record.start }}</span>
+                  <i class="fas fa-arrow-right"></i>
+                  <span>{{ record.end }}</span>
+                </div>
+                <div class="record-time">{{ record.time }}</div>
+              </div>
+              <button class="use-record-btn" @click="useHistoryRecord(record)">使用</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧地图容器 -->
+      <div class="map-container" id="container"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'RouteView',
+  data() {
+    return {
+      map: null,
+      startPoint: '',
+      viaPoint: '',
+      endPoint: '',
+      historyRecords: [
+        {
+          start: '北京南站',
+          end: '天安门广场',
+          time: '2024-01-20'
+        },
+        {
+          start: '首都机场',
+          end: '故宫博物院',
+          time: '2024-01-19'
+        }
+      ]
+    }
+  },
+  mounted() {
+    // 延迟初始化地图，确保容器已经渲染
+    this.$nextTick(() => {
+      this.initMap()
+    })
+  },
+  methods: {
+    initMap() {
+      // 初始化高德地图
+      this.map = new AMap.Map('container', {
+        zoom: 11,
+        center: [116.397428, 39.90923],
+        resizeEnable: true // 启用自动调整大小
+      })
+    },
+    useMyLocation() {
+      // 获取当前位置
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          this.startPoint = '当前位置'
+          // 更新地图中心点
+          this.map.setCenter([position.coords.longitude, position.coords.latitude])
+        })
+      }
+    },
+    clearViaPoint() {
+      this.viaPoint = ''
+    },
+    addViaPoint() {
+      // 添加途经点的逻辑
+    },
+    searchRoute() {
+      // 搜索路线的逻辑
+    },
+    useHistoryRecord(record) {
+      this.startPoint = record.start
+      this.endPoint = record.end
+    }
+  }
+}
+</script>
+
+<style scoped>
+.page-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-section {
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  width: 100%;
+  padding: 15px 40px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.nav-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.nav-btn:hover, .nav-btn.active {
+  color: #2196F3;
+  background-color: #e3f2fd;
+  transform: translateY(-2px);
+}
+
+.route-container {
+  margin-top: 60px;
+  flex: 1;
+}
+
+.route-container {
+  position: fixed; /* 改为固定定位 */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  background: white;
+}
+
+.route-panel {
+  position: relative; /* 添加相对定位 */
+  width: 400px;
+  height: 100%;
+  background: white;
+  padding: 20px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  overflow-y: auto;
+  z-index: 2; /* 确保面板在地图上层 */
+}
+
+.route-form {
+  margin-bottom: 30px;
+}
+
+.location-input {
+  margin-bottom: 20px;
+}
+
+.input-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.input-item label {
+  width: 30px;
+  height: 30px;
+  background: #2196F3;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.input-item input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.location-btn, .remove-btn, .add-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.location-btn {
+  background: #e3f2fd;
+  color: #2196F3;
+}
+
+.remove-btn {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.add-btn {
+  background: #e8f5e9;
+  color: #4caf50;
+}
+
+.search-btn {
+  width: 100%;
+  padding: 12px;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.history-records {
+  margin-top: 30px;
+}
+
+.history-records h3 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.record-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.record-points {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #333;
+}
+
+.record-time {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+
+.use-record-btn {
+  padding: 6px 12px;
+  background: #e3f2fd;
+  color: #2196F3;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.map-container {
+  flex: 1;
+  height: 100%;
+  position: relative; /* 添加相对定位 */
+  z-index: 1;
+}
+
+/* 确保地图容器有明确的尺寸 */
+#container {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 768px) {
+  .route-panel {
+    width: 100%;
+    height: 50%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+  }
+
+  .map-container {
+    height: 50%;
+    width: 100%;
+  }
+
+  .route-container {
+    flex-direction: column;
+  }
+}
+</style>
