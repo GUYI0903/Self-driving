@@ -34,10 +34,10 @@
                 我的位置
               </button>
             </div>
-            <div class="input-item">
+            <div class="input-item" v-for="(point, index) in viaPoints" :key="index">
               <label>经</label>
-              <input type="text" placeholder="请输入途经点（可选）" v-model="viaPoint" />
-              <button class="remove-btn" @click="clearViaPoint">
+              <input type="text" placeholder="请输入途经点" :value="point" @input="updateViaPoint(index, $event.target.value)" />
+              <button class="remove-btn" @click="removeViaPoint(index)">
                 <i class="fas fa-minus"></i>
               </button>
             </div>
@@ -73,6 +73,13 @@
 
       <!-- 右侧地图容器 -->
       <div class="map-container" id="container"></div>
+      <div class="map-controls">
+        <button class="zoom-btn" @click="zoomIn">+</button>
+        <button class="zoom-btn" @click="zoomOut">-</button>
+        <button class="locate-btn" @click="useMyLocation">
+          <i class="fas fa-map-marker-alt"></i>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -84,20 +91,9 @@ export default {
     return {
       map: null,
       startPoint: '',
-      viaPoint: '',
+      viaPoints: [], // 用于存储途经点
       endPoint: '',
-      historyRecords: [
-        {
-          start: '北京南站',
-          end: '天安门广场',
-          time: '2024-01-20'
-        },
-        {
-          start: '首都机场',
-          end: '故宫博物院',
-          time: '2024-01-19'
-        }
-      ]
+      historyRecords: []
     }
   },
   mounted() {
@@ -125,11 +121,14 @@ export default {
         })
       }
     },
-    clearViaPoint() {
-      this.viaPoint = ''
-    },
     addViaPoint() {
-      // 添加途经点的逻辑
+      this.viaPoints.push(''); // 添加一个空的途经点输入框
+    },
+    removeViaPoint(index) {
+      this.viaPoints.splice(index, 1); // 删除指定的途经点输入框
+    },
+    updateViaPoint(index, value) {
+      this.$set(this.viaPoints, index, value); // 更新途经点的值
     },
     searchRoute() {
       // 搜索路线的逻辑
@@ -137,6 +136,12 @@ export default {
     useHistoryRecord(record) {
       this.startPoint = record.start
       this.endPoint = record.end
+    },
+    zoomIn() {
+      this.map.setZoom(this.map.getZoom() + 1);
+    },
+    zoomOut() {
+      this.map.setZoom(this.map.getZoom() - 1);
     }
   }
 }
@@ -193,6 +198,7 @@ export default {
 .route-container {
   margin-top: 60px;
   flex: 1;
+  display: flex;
 }
 
 .route-container {
@@ -339,6 +345,33 @@ export default {
 #container {
   width: 100%;
   height: 100%;
+}
+
+.map-controls {
+  position: absolute;
+  bottom: 20px; /* 放在右下角 */
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.zoom-btn {
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.locate-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {
