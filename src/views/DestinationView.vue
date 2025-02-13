@@ -24,14 +24,9 @@
     <div class="main-content">
       <div class="carousel-section">
         <el-carousel :interval="4000" height="400px">
-          <el-carousel-item v-for="item in 4" :key="item">
-            <div class="carousel-placeholder">
-              <div class="placeholder-content">
-                <div class="placeholder-text">
-                  <h2>{{ carouselTexts[item-1].title }}</h2>
-                  <p>{{ carouselTexts[item-1].desc }}</p>
-                </div>
-              </div>
+          <el-carousel-item v-for="(image, index) in carouselImages" :key="index">
+            <div class="carousel-image">
+              <img :src="image" :alt="`carousel-${index + 1}`">
             </div>
           </el-carousel-item>
         </el-carousel>
@@ -60,28 +55,16 @@ export default {
   name: 'DestinationView',
   data() {
     return {
-      carouselTexts: [
-        {
-          title: '度假胜地',
-          desc: '享受完美的休闲时光'
-        },
-        {
-          title: '探索自然美景',
-          desc: '感受大自然的壮丽与神秘'
-        },
-        {
-          title: '体验文化之旅',
-          desc: '探索世界各地独特的人文风情'
-        },
-        {
-          title: '寻觅美食天堂',
-          desc: '品味各地特色美食与文化'
-        }
+      carouselImages: [
+        '/images/weihai.jpeg',
+        '/images/jinan.jpeg',
+        '/images/qingdao.jpg',
+        '/images/yantai.jpg'
       ],
       cities: [
         {
           name: '济南',
-          image: '/images/jinan.jpg',
+          image: '/images/jinan.jpeg',
           description: '济南，别称"泉城"，是山东省省会，拥有72处天下名泉，以趵突泉、黑虎泉、珍珠泉为"济南三大名泉"。这里不仅有泉水，还有大明湖、千佛山等著名景点。'
         },
         {
@@ -96,7 +79,7 @@ export default {
         },
         {
           name: '威海',
-          image: '/images/weihai.jpg',
+          image: '/images/weihai.jpeg',
           description: '威海是一座风景秀丽的滨海城市，拥有碧海蓝天、金沙滩、绿色山峦等自然景观。这里有刘公岛、威海古城、华夏城等著名景点，是一个适合休闲度假的好去处。'
         }
       ]
@@ -161,6 +144,18 @@ export default {
   background: #2196F3;
 }
 
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.carousel-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 :deep(.el-carousel__container) {
   height: 400px !important;
 }
@@ -180,43 +175,6 @@ export default {
 :deep(.el-carousel__indicator.is-active .el-carousel__button) {
   background-color: #fff;
   transform: scale(1.2);
-}
-
-.carousel-placeholder {
-  height: 100%;
-  background: transparent;
-  position: relative;
-}
-
-.placeholder-content {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px;
-  position: relative;
-  z-index: 1;
-}
-
-.placeholder-text {
-  color: white;
-  transform: translateY(-20px);
-}
-
-.placeholder-text h2 {
-  font-size: 48px;
-  margin-bottom: 20px;
-  font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.placeholder-text p {
-  font-size: 24px;
-  opacity: 0.95;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 .content-wrapper {

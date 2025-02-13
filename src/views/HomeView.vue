@@ -3,23 +3,11 @@ export default {
   name: 'HomeView',
   data() {
     return {
-      carouselTexts: [
-        {
-          title: '探索自然美景',
-          desc: '感受大自然的壮丽与神秘'
-        },
-        {
-          title: '体验文化之旅',
-          desc: '探索世界各地独特的人文风情'
-        },
-        {
-          title: '寻觅美食天堂',
-          desc: '品味各地特色美食与文化'
-        },
-        {
-          title: '度假胜地',
-          desc: '享受完美的休闲时光'
-        }
+      carouselImages: [
+        '/src/assets/carousel/baotuquan.jpeg',
+        '/src/assets/carousel/buluweisi.jpeg',
+        '/src/assets/carousel/taishan.jpg',
+        '/src/assets/carousel/zhanqiao.jpeg'
       ]
     }
   },
@@ -43,7 +31,7 @@ export default {
     <div class="header">
       <div class="header-content">
         <div class="logo">
-          <img src="@/assets/travel-logo.png" alt="Travel Logo" class="logo-img" />
+          <img src="/src/assets/travel-logo.png" alt="Travel Logo" class="logo-img" />
         </div>
         
         <div class="search-box">
@@ -85,15 +73,9 @@ export default {
     <div class="main-content">
       <div class="carousel">
         <el-carousel :interval="4000" type="card" height="500px">
-          <el-carousel-item v-for="item in 4" :key="item">
-            <div class="carousel-placeholder">
-              <div class="placeholder-content">
-                <div class="placeholder-text">
-                  <h2>{{ carouselTexts[item-1].title }}</h2>
-                  <p>{{ carouselTexts[item-1].desc }}</p>
-                </div>
-                <div class="placeholder-overlay"></div>
-              </div>
+          <el-carousel-item v-for="(image, index) in carouselImages" :key="index">
+            <div class="carousel-image">
+              <img :src="image" :alt="`carousel-${index + 1}`">
             </div>
           </el-carousel-item>
         </el-carousel>
@@ -269,54 +251,17 @@ export default {
   margin-top: 20px;
 }
 
-.carousel-placeholder {
+.carousel-image {
+  width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #2196F3, #1976D2);
   border-radius: 12px;
   overflow: hidden;
 }
 
-.placeholder-content {
+.carousel-image img {
+  width: 100%;
   height: 100%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f0f2f5;
-  transition: all 0.3s ease;
-}
-
-.placeholder-text {
-  text-align: center;
-  color: white;
-  position: relative;
-  z-index: 2;
-  padding: 20px;
-}
-
-.placeholder-text h2 {
-  font-size: 32px;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-
-.placeholder-text p {
-  font-size: 18px;
-  opacity: 0.9;
-}
-
-.placeholder-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    45deg,
-    rgba(33, 150, 243, 0.9),
-    rgba(25, 118, 210, 0.9)
-  );
-  z-index: 1;
+  object-fit: cover;
 }
 
 :deep(.el-carousel__item) {
