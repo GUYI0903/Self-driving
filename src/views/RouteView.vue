@@ -66,19 +66,21 @@
                 <div class="record-time">{{ record.time }}</div>
               </div>
               <button class="use-record-btn" @click="useHistoryRecord(record)">使用</button>
+              <button class="delete-record-btn" @click="deleteHistoryRecord(index)">删除</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- 右侧地图容器 -->
-      <div class="map-container" id="container"></div>
-      <div class="map-controls">
-        <button class="zoom-btn" @click="zoomIn">+</button>
-        <button class="zoom-btn" @click="zoomOut">-</button>
-        <button class="locate-btn" @click="useMyLocation">
-          <i class="fas fa-map-marker-alt"></i>
-        </button>
+      <div class="map-container" id="container">
+        <div class="map-controls">
+          <button class="zoom-btn" @click="zoomIn">+</button>
+          <button class="zoom-btn" @click="zoomOut">-</button>
+          <button class="locate-btn" @click="useMyLocation">
+            <i class="fas fa-map-marker-alt"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -93,7 +95,7 @@ export default {
       startPoint: '',
       viaPoints: [], // 用于存储途经点
       endPoint: '',
-      historyRecords: []
+      historyRecords: [] // 用于存储历史记录
     }
   },
   mounted() {
@@ -107,7 +109,7 @@ export default {
       // 初始化高德地图
       this.map = new AMap.Map('container', {
         zoom: 11,
-        center: [116.397428, 39.90923],
+        center: [116.397428, 39.90923], // 默认中心点
         resizeEnable: true // 启用自动调整大小
       })
     },
@@ -115,10 +117,23 @@ export default {
       // 获取当前位置
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
-          this.startPoint = '当前位置'
-          // 更新地图中心点
-          this.map.setCenter([position.coords.longitude, position.coords.latitude])
-        })
+          const { longitude, latitude } = position.coords;
+          this.startPoint = '当前位置'; // 设置起点为当前位置
+          this.map.setCenter([longitude, latitude]); // 更新地图中心点
+          this.map.setZoom(15); // 可选：放大地图以更好地显示当前位置
+
+          // 可选：在当前位置添加标记
+          const marker = new AMap.Marker({
+            position: [longitude, latitude],
+            title: '我的位置'
+          });
+          marker.setMap(this.map);
+        }, (error) => {
+          console.error('获取位置失败', error);
+          alert('无法获取当前位置，请检查浏览器的地理位置权限设置。');
+        });
+      } else {
+        alert('浏览器不支持地理位置服务。');
       }
     },
     addViaPoint() {
@@ -131,11 +146,40 @@ export default {
       this.$set(this.viaPoints, index, value); // 更新途经点的值
     },
     searchRoute() {
-      // 搜索路线的逻辑
+      // 在这里实现路线规划逻辑
+      const waypoints = this.viaPoints.map(point => point.trim()).filter(point => point);
+      const route = {
+        origin: this.startPoint,
+        destination: this.endPoint,
+        waypoints: waypoints
+      };
+      // 调用高德地图的路径规划 API
+      AMap.service('AMap.Driving', () => {
+        const driving = new AMap.Driving({
+          map: this.map,
+          panel: 'panel'
+        });
+        driving.search(route.origin, route.destination, { waypoints: route.waypoints }, (status, result) => {
+          if (status === 'complete') {
+            console.log('路线规划成功', result);
+            // 保存历史记录
+            this.historyRecords.push({
+              start: this.startPoint,
+              end: this.endPoint,
+              time: new Date().toLocaleString()
+            });
+          } else {
+            console.error('路线规划失败', result);
+          }
+        });
+      });
     },
     useHistoryRecord(record) {
-      this.startPoint = record.start
-      this.endPoint = record.end
+      this.startPoint = record.start;
+      this.endPoint = record.end;
+    },
+    deleteHistoryRecord(index) {
+      this.historyRecords.splice(index, 1); // 删除指定的历史记录
     },
     zoomIn() {
       this.map.setZoom(this.map.getZoom() + 1);
@@ -201,27 +245,13 @@ export default {
   display: flex;
 }
 
-.route-container {
-  position: fixed; /* 改为固定定位 */
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  width: 100%;
-  height: 100vh;
-  background: white;
-}
-
 .route-panel {
-  position: relative; /* 添加相对定位 */
   width: 400px;
   height: 100%;
   background: white;
   padding: 20px;
   box-shadow: 2px 0 10px rgba(0,0,0,0.1);
   overflow-y: auto;
-  z-index: 2; /* 确保面板在地图上层 */
 }
 
 .route-form {
@@ -334,11 +364,20 @@ export default {
   cursor: pointer;
 }
 
+.delete-record-btn {
+  padding: 6px 12px;
+  background: #ffebee;
+  color: #f44336;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 .map-container {
   flex: 1;
   height: 100%;
   position: relative; /* 添加相对定位 */
-  z-index: 1;
+  z-index: 1; /* 确保地图在上层 */
 }
 
 /* 确保地图容器有明确的尺寸 */
@@ -353,6 +392,7 @@ export default {
   right: 20px;
   display: flex;
   flex-direction: column;
+  z-index: 2; /* 确保按钮在地图上方 */
 }
 
 .zoom-btn {

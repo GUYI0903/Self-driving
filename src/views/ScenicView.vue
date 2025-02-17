@@ -1,46 +1,39 @@
 <script>
+import taishan from '@/assets/carousel/taishan.jpg';
+import baotoquan from '@/assets/carousel/baotuquan.jpeg';
+import zhanqiao from '@/assets/carousel/zhanqiao.jpeg';
+import buluweisi from '@/assets/carousel/buluweisi.jpeg';
+
 export default {
   name: 'ScenicView',
   data() {
     return {
-      carouselTexts: [
-        {
-          title: '故宫博物院',
-          desc: '世界上现存规模最大、保存最完整的木质结构古建筑群'
-        },
-        {
-          title: '长城',
-          desc: '中国古代伟大的防御工程，世界文化遗产'
-        },
-        {
-          title: '西湖',
-          desc: '中国十大风景名胜之一，人间天堂'
-        },
-        {
-          title: '黄山',
-          desc: '奇松、怪石、云海、温泉、冬雪五绝闻名于世'
-        }
+      carouselImages: [
+        taishan,
+        baotoquan,
+        zhanqiao,
+        buluweisi
       ],
       scenicSpots: [
         {
           name: '泰山',
-          image: '/images/taishan.jpg',
+          image: taishan,
           description: '泰山是中国五岳之首，位于山东省中部。以气势磅礴、雄伟高大而著称，有"天下第一山"之称。这里不仅有壮丽的自然风光，还有深厚的文化底蕴，是自然与人文的完美结合。'
         },
         {
           name: '趵突泉',
-          image: '/images/baotoquan.jpg',
+          image: baotoquan,
           description: '趵突泉位于济南市区，是泉城济南的象征，有"天下第一泉"之称。泉水四季喷涌，昼夜不息，水质清冽甘甜，是济南最负盛名的景点之一。'
         },
         {
-          name: '崂山',
-          image: '/images/laoshan.jpg',
-          description: '崂山位于青岛市东部，是中国海岸线上最高的山，也是道教名山。这里山海相连，风景秀丽，有"海上名山第一"的美誉，是登山观海的绝佳去处。'
+          name: '栈桥',
+          image: zhanqiao,
+          description: '栈桥位于青岛市，是青岛的标志性景点之一。这里有美丽的海景和丰富的历史文化，是游客拍照留念的好地方。'
         },
         {
-          name: '蓬莱阁',
-          image: '/images/penglai.jpg',
-          description: '蓬莱阁位于烟台蓬莱市，是中国四大名阁之一。这里不仅有气势恢宏的古建筑群，还有神奇的海市蜃楼景观，是一个充满传奇色彩的旅游胜地。'
+          name: '布鲁维斯号',
+          image: buluweisi,
+          description: '布鲁维斯号位于威海市，是一处极具特色的网红打卡地。它曾是一艘运输船，如今静静侧卧在海岸边，船身锈迹斑驳却充满故事感。与周边湛蓝的大海、金色的沙滩相互映衬，构建出独特而迷人的景观，是游客们前来打卡拍照、感受别样风情的绝佳选择。'
         }
       ]
     }
@@ -74,14 +67,9 @@ export default {
     <div class="main-content">
       <div class="carousel-section">
         <el-carousel :interval="4000" height="400px">
-          <el-carousel-item v-for="item in 4" :key="item">
-            <div class="carousel-placeholder">
-              <div class="placeholder-content">
-                <div class="placeholder-text">
-                  <h2>{{ carouselTexts[item-1].title }}</h2>
-                  <p>{{ carouselTexts[item-1].desc }}</p>
-                </div>
-              </div>
+          <el-carousel-item v-for="(image, index) in carouselImages" :key="index">
+            <div class="carousel-image">
+              <img :src="image" :alt="`carousel-${index + 1}`">
             </div>
           </el-carousel-item>
         </el-carousel>
@@ -162,6 +150,18 @@ export default {
   background: #2196F3;
 }
 
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.carousel-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 :deep(.el-carousel__container) {
   height: 400px !important;
 }
@@ -181,54 +181,6 @@ export default {
 :deep(.el-carousel__indicator.is-active .el-carousel__button) {
   background-color: #fff;
   transform: scale(1.2);
-}
-
-.carousel-placeholder {
-  height: 100%;
-  background: transparent;
-  position: relative;
-}
-
-.placeholder-content {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px;
-  position: relative;
-  z-index: 1;
-}
-
-.placeholder-text {
-  color: white;
-  transform: translateY(-20px);
-}
-
-.placeholder-text h2 {
-  font-size: 48px;
-  margin-bottom: 20px;
-  font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.placeholder-text p {
-  font-size: 24px;
-  opacity: 0.95;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-@media (max-width: 768px) {
-  .placeholder-text h2 {
-    font-size: 36px;
-  }
-
-  .placeholder-text p {
-    font-size: 18px;
-  }
 }
 
 .content-wrapper {
